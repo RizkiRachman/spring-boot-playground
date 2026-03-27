@@ -20,6 +20,44 @@ Uses Maven with `pom.xml` in project root. Currently using Spring Boot 4.0.0.
 - **Build JAR**: `mvn clean package`
 - **Debug**: Run in IDE with breakpoints, or use `mvn spring-boot:run` with JVM debug options
 
+## Pre-PR Requirements (CRITICAL)
+
+Before creating any Pull Request, AI MUST:
+
+1. **Clean Compile**
+   ```bash
+   mvn clean compile -q
+   ```
+   - Must complete without errors
+   - No compilation warnings (fix or document if unavoidable)
+
+2. **Run Tests**
+   ```bash
+   mvn test
+   ```
+   - All tests must pass
+   - If no tests exist, note it in PR description
+
+3. **Start Application Locally**
+   ```bash
+   mvn spring-boot:run
+   ```
+   - Verify app starts without errors
+   - Check logs for exceptions
+   - Confirm port 8080 is accessible
+
+4. **Manual Testing**
+   - Test all modified endpoints
+   - Verify rate limiting works
+   - Check error response format
+   - Test both success and failure cases
+
+5. **Verify No Breaking Changes**
+   - Check existing functionality still works
+   - Verify API contracts are maintained
+
+**⚠️ DO NOT CREATE PR if any step fails. Fix issues first!**
+
 ## Conventions
 - Package structure: `com.example.{projectname}.{layer}`
 - Use Lombok for reducing boilerplate code (@Data, @AllArgsConstructor, @NoArgsConstructor)
