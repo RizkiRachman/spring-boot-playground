@@ -36,7 +36,9 @@ Before creating any Pull Request, AI MUST:
    mvn test
    ```
    - All tests must pass
-   - If no tests exist, note it in PR description
+   - Minimum 90% code coverage required
+   - Generate coverage report: `mvn jacoco:report`
+   - View report: `target/site/jacoco/index.html`
 
 3. **Start Application Locally**
    ```bash
@@ -57,6 +59,41 @@ Before creating any Pull Request, AI MUST:
    - Verify API contracts are maintained
 
 **⚠️ DO NOT CREATE PR if any step fails. Fix issues first!**
+
+## Testing Standards
+
+### Coverage Requirements
+- **Minimum**: 90% line coverage
+- **Minimum**: 90% branch coverage
+- **Target**: 100% for business logic
+- Check coverage: `mvn clean test jacoco:report`
+
+### Test Organization
+```
+src/test/java/com/example/springbootplayground/
+├── config/
+│   └── RateLimiterTest.java
+├── controller/
+│   └── HelloControllerTest.java
+├── service/
+│   └── RateLimiterServiceTest.java
+├── util/
+│   ├── RequestUtilsTest.java
+│   └── StringUtilsTest.java
+└── exception/
+    └── GlobalExceptionHandlerTest.java
+```
+
+### Test Naming Conventions
+- Class name: `{ClassName}Test`
+- Method name: `should{ExpectedBehavior}When{Condition}`
+- Use @DisplayName for human-readable descriptions
+
+### Required Test Types
+- ✅ Unit tests for all public methods
+- ✅ Edge case testing (null, empty, boundary values)
+- ✅ Exception testing
+- ✅ Happy path testing
 
 ## Conventions
 - Package structure: `com.example.{projectname}.{layer}`
