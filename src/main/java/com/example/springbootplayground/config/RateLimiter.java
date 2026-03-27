@@ -3,7 +3,6 @@ package com.example.springbootplayground.config;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -15,8 +14,8 @@ public class RateLimiter {
     private final int requestsPerMinute;
     private final ConcurrentHashMap<String, Bucket> buckets = new ConcurrentHashMap<>();
 
-    public RateLimiter(@Value("${rate.limiter.requests.per.minute:10}") int requestsPerMinute) {
-        this.requestsPerMinute = requestsPerMinute;
+    public RateLimiter(RateLimiterProperties properties) {
+        this.requestsPerMinute = properties.getFilter().getRequestsPerMinute();
     }
 
     public boolean isAllowed(String clientId) {

@@ -10,6 +10,6 @@ public class RateLimiterConfig {
 
     @Bean
     public RateLimiter rateLimiter(RateLimiterProperties properties) {
-        return new RateLimiter(properties.getFilter().getRequestsPerMinute());
+        return new RateLimiter(properties);
     }
 }

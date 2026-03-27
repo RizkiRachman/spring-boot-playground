@@ -4,7 +4,6 @@ import com.example.springbootplayground.constant.ErrorMessages;
 import com.example.springbootplayground.service.RateLimiterService;
 import com.example.springbootplayground.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +16,11 @@ import java.util.Map;
 @RestController
 public class HelloController {
 
-    @Autowired
-    private RateLimiterService rateLimiterService;
+    private final RateLimiterService rateLimiterService;
+
+    public HelloController(RateLimiterService rateLimiterService) {
+        this.rateLimiterService = rateLimiterService;
+    }
 
     @GetMapping("/hello")
     public ResponseEntity<String> hello() {
