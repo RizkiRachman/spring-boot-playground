@@ -1,6 +1,5 @@
 package com.example.springbootplayground.controller;
 
-import com.example.springbootplayground.constant.ErrorMessages;
 import com.example.springbootplayground.service.RateLimiterService;
 import com.example.springbootplayground.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,7 +35,7 @@ public class HelloController {
         String endpointKey = "external:" + apiName;
 
         // Service-layer rate limiting with properties configuration
-        if (!rateLimiterService.isAllowedForEndpoint(endpointKey, clientId)) {
+        if (rateLimiterService.isAllowedForEndpoint(endpointKey, clientId)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                     .body(Map.of(
                             "id", StringUtils.generateFastId(),
@@ -60,7 +59,7 @@ public class HelloController {
         String clientId = getClientId(request);
 
         // Service-layer rate limiting with properties configuration
-        if (!rateLimiterService.isAllowedForEndpoint("premium", clientId)) {
+        if (rateLimiterService.isAllowedForEndpoint("premium", clientId)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                     .body(Map.of(
                             "id", StringUtils.generateFastId(),
