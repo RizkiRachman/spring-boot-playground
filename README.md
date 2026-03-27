@@ -151,7 +151,9 @@ open target/test-report/index.html
 
 ### HTML Test Report
 
-Generate a beautiful HTML report with:
+Beautiful HTML report is **automatically generated** after every test run!
+
+**Features:**
 - Summary cards (Total, Passed, Failed, Errors, Time)
 - Visual progress bar with pass rate
 - Detailed test class breakdown
@@ -159,13 +161,14 @@ Generate a beautiful HTML report with:
 - Execution time statistics
 
 ```bash
-# Run tests and generate report
+# Run tests - report generates automatically!
 mvn clean test
-python3 generate-test-report.py
 
 # View report
 open target/test-report/index.html
 ```
+
+**Note:** Report generation is integrated into Maven build via Exec Plugin. No manual steps needed!
 
 **Note**: JaCoCo coverage is temporarily disabled due to Java 26 preview incompatibility.
 

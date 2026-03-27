@@ -40,24 +40,40 @@ mvn clean test
 
 ### Generate HTML Test Report
 
-We provide a custom Python script to generate beautiful HTML test reports from Maven Surefire results:
+We provide a custom Python script to generate beautiful HTML test reports from Maven Surefire results.
 
-#### Prerequisites
-- Python 3.x installed
-- Tests already run (`mvn clean test`)
+#### Option 1: Automatic Generation (Recommended)
 
-#### Generate Report
+The HTML report is now automatically generated after every test run:
 
 ```bash
-# Run tests first
+# Run tests - report generates automatically
 mvn clean test
 
-# Generate HTML report
+# View the report
+open target/test-report/index.html
+```
+
+**How it works:**
+- Maven Exec Plugin runs `generate-test-report.py` automatically after tests complete
+- No manual steps needed
+- Report always reflects latest test results
+
+#### Option 2: Manual Generation
+
+If you need to regenerate the report without running tests:
+
+```bash
+# Generate report manually
 python3 generate-test-report.py
 
 # Or with custom output path
 python3 generate-test-report.py target/surefire-reports target/test-report/index.html
 ```
+
+#### Prerequisites
+- Python 3.x installed
+- Tests already run (`mvn clean test`)
 
 #### Report Features
 
