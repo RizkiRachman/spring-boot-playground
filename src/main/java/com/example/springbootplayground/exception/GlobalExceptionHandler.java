@@ -2,6 +2,7 @@ package com.example.springbootplayground.exception;
 
 import com.example.springbootplayground.constant.ErrorMessages;
 import com.example.springbootplayground.dto.ErrorResponse;
+import com.example.springbootplayground.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -10,18 +11,15 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.Instant;
-import java.util.concurrent.ThreadLocalRandom;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-    private static final String ID_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    private static final int ID_LENGTH = 16;
 
     @ExceptionHandler(RateLimitExceededException.class)
     public ResponseEntity<ErrorResponse> handleRateLimitExceededException(RateLimitExceededException ex) {
-        String errorId = generateFastId();
+        String errorId = StringUtils.generateFastId();
 
         ErrorResponse errorResponse = new ErrorResponse(
                 errorId,
@@ -37,7 +35,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex) {
-        String errorId = generateFastId();
+        String errorId = StringUtils.generateFastId();
 
         log.error("Unhandled exception: errorId={}", errorId, ex);
 
@@ -50,14 +48,5 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-    }
-
-    private String generateFastId() {
-        StringBuilder sb = new StringBuilder(ID_LENGTH);
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-        for (int i = 0; i < ID_LENGTH; i++) {
-            sb.append(ID_CHARS.charAt(random.nextInt(ID_CHARS.length())));
-        }
-        return sb.toString();
     }
 }

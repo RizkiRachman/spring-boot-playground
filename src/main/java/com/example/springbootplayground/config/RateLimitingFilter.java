@@ -2,6 +2,7 @@ package com.example.springbootplayground.config;
 
 import com.example.springbootplayground.constant.ErrorMessages;
 import com.example.springbootplayground.dto.ErrorResponse;
+import com.example.springbootplayground.util.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,13 +16,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 public class RateLimitingFilter extends OncePerRequestFilter {
-
-    private static final String ID_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    private static final int ID_LENGTH = 16;
 
     @Autowired
     private RateLimiter rateLimiter;
@@ -37,7 +34,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
         if (!rateLimiter.isAllowed(clientId)) {
             ErrorResponse errorResponse = new ErrorResponse(
-                    generateFastId(),
+                    StringUtils.generateFastId(),
                     HttpStatus.TOO_MANY_REQUESTS.value(),
                     ErrorMessages.TOO_MANY_REQUESTS,
                     ErrorMessages.RATE_LIMIT_EXCEEDED,
@@ -53,15 +50,6 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private String generateFastId() {
-        StringBuilder sb = new StringBuilder(ID_LENGTH);
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-        for (int i = 0; i < ID_LENGTH; i++) {
-            sb.append(ID_CHARS.charAt(random.nextInt(ID_CHARS.length())));
-        }
-        return sb.toString();
     }
 
     private String getClientId(HttpServletRequest request) {
