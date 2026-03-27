@@ -21,13 +21,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleRateLimitExceededException(RateLimitExceededException ex) {
         String errorId = StringUtils.generateFastId();
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                errorId,
-                HttpStatus.TOO_MANY_REQUESTS.value(),
-                ErrorMessages.TOO_MANY_REQUESTS,
-                ex.getMessage(),
-                Instant.now().toString()
-        );
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .id(errorId)
+                .errorCode(HttpStatus.TOO_MANY_REQUESTS.value())
+                .errorMessage(ErrorMessages.TOO_MANY_REQUESTS)
+                .detailMessage(ex.getMessage())
+                .timestamp(Instant.now().toString())
+                .build();
 
         log.debug("Rate limit exceeded: errorId={}", errorId);
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(errorResponse);
@@ -39,13 +39,13 @@ public class GlobalExceptionHandler {
 
         log.error("Unhandled exception: errorId={}", errorId, ex);
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                errorId,
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                ErrorMessages.INTERNAL_SERVER_ERROR,
-                "An unexpected error occurred. Reference: " + errorId,
-                Instant.now().toString()
-        );
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .id(errorId)
+                .errorCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .errorMessage(ErrorMessages.INTERNAL_SERVER_ERROR)
+                .detailMessage("An unexpected error occurred. Reference: " + errorId)
+                .timestamp(Instant.now().toString())
+                .build();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
