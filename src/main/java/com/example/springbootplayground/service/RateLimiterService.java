@@ -4,7 +4,6 @@ import com.example.springbootplayground.config.RateLimiterProperties;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -14,9 +13,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RateLimiterService {
 
     private final ConcurrentHashMap<String, Bucket> endpointBuckets = new ConcurrentHashMap<>();
+    private final RateLimiterProperties properties;
 
-    @Autowired
-    private RateLimiterProperties properties;
+    public RateLimiterService(RateLimiterProperties properties) {
+        this.properties = properties;
+    }
 
     public boolean isAllowed(String endpointKey, int limitPerMinute) {
         Bucket bucket = endpointBuckets.computeIfAbsent(endpointKey, k -> createBucket(limitPerMinute));

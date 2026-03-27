@@ -16,7 +16,7 @@ public class AppConfig {
         ObjectMapper mapper = new ObjectMapper();
 
         // Serialization settings
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
         mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 
         // Disable pretty printing in production (saves bytes)
