@@ -1,57 +1,137 @@
 # Spring Boot Playground
 
-A playground project for experimenting with Spring Boot features and best practices.
+A playground project for experimenting with Spring Boot features and best practices, featuring production-ready rate limiting, exception handling, and Java 26 preview features.
 
 ## 🚀 Features
 
-- ✨ REST API with Spring Boot
-- 🛡️ Rate Limiting (Bucket4j)
-- ⚡ Exception Handling (@ControllerAdvice)
-- 📝 Configuration Properties
-- 🔧 Constructor Injection
-- 📊 Global Exception Handling
+- ✨ **REST API** with Spring Boot 4.0.0
+- 🛡️ **Dual-Layer Rate Limiting** (Bucket4j + Filter/Service)
+- ⚡ **Exception Handling** with @ControllerAdvice
+- 📝 **Configuration Properties** for flexible rate limiting
+- 🔧 **Constructor Injection** for thread safety
+- 📊 **Global Exception Handling** with standardized JSON responses
+- 🏗️ **Lombok** for boilerplate reduction
+- ☕ **Java 26** with preview features enabled
 
 ## 🏗️ Architecture
 
 ```
-├── src/main/java/com/example/springbootplayground/
-│   ├── config/          # Configuration classes
-│   ├── controller/      # REST controllers
-│   ├── service/         # Business logic
-│   ├── dto/            # Data transfer objects
-│   ├── exception/      # Custom exceptions & handlers
-│   └── util/           # Utility classes
-├── src/main/resources/
-│   └── application.properties
-└── .github/
-    └── PULL_REQUEST_TEMPLATE.md
+src/main/java/com/example/springbootplayground/
+├── config/                    # Configuration classes
+│   ├── AppConfig.java
+│   ├── RateLimiter.java        # Filter layer rate limiter (Bucket4j)
+│   ├── RateLimiterConfig.java
+│   ├── RateLimiterProperties.java
+│   └── RateLimitingFilter.java
+├── controller/                # REST controllers
+│   └── HelloController.java
+├── service/                   # Business logic
+│   └── RateLimiterService.java
+├── dto/                      # Data transfer objects (Lombok)
+│   └── ErrorResponse.java
+├── exception/               # Custom exceptions & handlers
+│   ├── GlobalExceptionHandler.java
+│   └── RateLimitExceededException.java
+├── util/                   # Utility classes
+│   ├── RequestUtils.java
+│   └── StringUtils.java
+└── constant/
+    └── ErrorMessages.java
 ```
 
 ## 🚀 Quick Start
 
 ```bash
+# Compile the application
+mvn clean compile
+
 # Run the application
 mvn spring-boot:run
 
-# Test the API
+# Test the basic endpoint
 curl http://localhost:8080/hello
+# Response: Hello, World!
 
-# Rate limiting test (10 req/min)
-for i in {1..12}; do curl http://localhost:8080/hello; done
+# Test filter layer rate limiting (10 req/min)
+for i in {1..12}; do curl -s http://localhost:8080/hello; done
+# Requests 1-10: HTTP 200
+# Requests 11+: HTTP 429 (Too Many Requests)
+
+# Test external API with service layer
+curl "http://localhost:8080/api/external?apiName=default"
+
+# Test premium API
+curl http://localhost:8080/api/premium
+```
+
+## 🛡️ Rate Limiting Architecture
+
+### Filter Layer (Global Protection)
+- **Location**: `RateLimitingFilter`
+- **Limit**: 10 requests per minute (configurable)
+- **Scope**: All endpoints
+- **Purpose**: DDoS protection
+
+### Service Layer (Per-Endpoint)
+- **Location**: `RateLimiterService`
+- **Configurable limits** via `application.properties`:
+  - `hello`: 20 req/min
+  - `external-default`: 20 req/min
+  - `external-slow`: 5 req/min
+  - `external-fast`: 50 req/min
+  - `premium`: 100 req/min
+- **Client-specific overrides** supported
+
+### Error Response Format
+```json
+{
+  "id": "7d8921e9-b7fd-49d8-a394-a59d668916df",
+  "errorCode": 429,
+  "errorMessage": "Too Many Requests",
+  "detailMessage": "Rate limit exceeded. Try again later.",
+  "timestamp": "2026-03-27T07:40:18.368396Z"
+}
 ```
 
 ## 📚 Documentation
 
 - **AI Agent Documentation**: See [.ai/README.md](.ai/README.md)
+  - Project conventions
+  - Coding standards
+  - Pre-PR requirements
 - **PR Guidelines**: See [.github/PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md)
 
 ## 🔧 Technologies
 
-- Spring Boot 4.0.0
-- Java 17
-- Bucket4j (Rate Limiting)
-- Maven
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| Spring Boot | 4.0.0 | Web framework |
+| Java | 26 (Preview) | Language |
+| Bucket4j | 8.17.0 | Rate limiting |
+| Lombok | Latest | Boilerplate reduction |
+| Maven | 3.9+ | Build tool |
+| Jackson | Latest | JSON serialization |
+
+## 🎯 Java 26 Features
+
+- ✅ **Records** (Stable) - Used in ErrorResponse
+- ✅ **Switch Expressions** (Stable) - Used in configuration
+- 🔍 **Preview Features Enabled**:
+  - String Templates (when stable)
+  - Unnamed Variables
+  - Pattern Matching enhancements
 
 ## 🤝 Contributing
 
 Please follow our [PR template](.github/PULL_REQUEST_TEMPLATE.md) when submitting changes.
+
+### Pre-PR Checklist
+- [ ] Clean compile (`mvn clean compile -q`)
+- [ ] Run tests (`mvn test`)
+- [ ] Start application locally (`mvn spring-boot:run`)
+- [ ] Manual testing completed
+- [ ] No breaking changes
+
+---
+
+*Built with ❤️ using Spring Boot and Java 26*

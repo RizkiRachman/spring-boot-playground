@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.Instant;
 import java.util.Map;
 
+import static com.example.springbootplayground.util.RequestUtils.getClientId;
+
 @RestController
 public class HelloController {
 
@@ -75,18 +77,5 @@ public class HelloController {
                 "tier", "premium",
                 "clientId", clientId
         ));
-    }
-
-    private String getClientId(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
-        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-            int commaIndex = xForwardedFor.indexOf(',');
-            if (commaIndex > 0) {
-                return xForwardedFor.substring(0, commaIndex).trim();
-            }
-            return xForwardedFor.trim();
-        }
-        String remoteAddr = request.getRemoteAddr();
-        return remoteAddr != null ? remoteAddr : "unknown";
     }
 }

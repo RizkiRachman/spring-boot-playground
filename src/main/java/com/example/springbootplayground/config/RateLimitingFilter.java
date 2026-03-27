@@ -2,7 +2,6 @@ package com.example.springbootplayground.config;
 
 import com.example.springbootplayground.constant.ErrorMessages;
 import com.example.springbootplayground.dto.ErrorResponse;
-import com.example.springbootplayground.util.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,6 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.UUID;
 
 @Component
 public class RateLimitingFilter extends OncePerRequestFilter {
@@ -35,13 +35,13 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         String clientId = getClientId(request);
 
         if (!rateLimiter.isAllowed(clientId)) {
-            ErrorResponse errorResponse = new ErrorResponse(
-                    StringUtils.generateFastId(),
-                    HttpStatus.TOO_MANY_REQUESTS.value(),
-                    ErrorMessages.TOO_MANY_REQUESTS,
-                    ErrorMessages.RATE_LIMIT_EXCEEDED,
-                    Instant.now().toString()
-            );
+            ErrorResponse errorResponse = ErrorResponse.builder()
+                    .id(UUID.randomUUID().toString())
+                    .errorCode(HttpStatus.TOO_MANY_REQUESTS.value())
+                    .errorMessage(ErrorMessages.TOO_MANY_REQUESTS)
+                    .detailMessage(ErrorMessages.RATE_LIMIT_EXCEEDED)
+                    .timestamp(Instant.now().toString())
+                    .build();
 
             String jsonResponse = objectMapper.writeValueAsString(errorResponse);
 
@@ -57,7 +57,6 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     private String getClientId(HttpServletRequest request) {
         String xForwardedFor = request.getHeader("X-Forwarded-For");
         if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-            // Manual parse to avoid regex split overhead
             int commaIndex = xForwardedFor.indexOf(',');
             if (commaIndex > 0) {
                 return xForwardedFor.substring(0, commaIndex).trim();

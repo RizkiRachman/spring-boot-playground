@@ -1,10 +1,18 @@
 package com.example.springbootplayground.dto;
 
-public record ErrorResponse(
-        String id,
-        int errorCode,
-        String errorMessage,
-        String detailMessage,
-        String timestamp
-) {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ErrorResponse {
+    private String id;
+    private int errorCode;
+    private String errorMessage;
+    private String detailMessage;
+    private String timestamp;
 }
