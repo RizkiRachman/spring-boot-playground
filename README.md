@@ -123,73 +123,53 @@ curl http://localhost:8080/api/premium
 
 ## 🧪 Testing
 
-### Test Suite Overview
-- **Total Tests**: 155 tests across 7 test classes
-- **Test Coverage**: Comprehensive unit testing for all major components
-- **Test Framework**: JUnit 5 with Mockito
+We have **155 comprehensive unit tests** covering all major components.
 
-### Running Tests
+### Quick Start
 
 ```bash
 # Run all tests
 mvn clean test
 
-# Run tests with coverage (JaCoCo - temporarily disabled for Java 26)
-# mvn clean test jacoco:report
-
-# View test report
-open target/surefire-reports/index.html
+# Generate beautiful HTML report
+python3 generate-test-report.py
+open target/test-report/index.html
 ```
 
-### Test Structure
+### Test Summary
 
+| Component | Tests | Coverage | Status |
+|-----------|-------|----------|--------|
+| StringUtils | 105 | 100% | ✅ |
+| ErrorResponse | 8 | 100% | ✅ |
+| RateLimiterProperties | 13 | 100% | ✅ |
+| RateLimiterService | 13 | 100% | ✅ |
+| RequestUtils | 6 | 100% | ✅ |
+| RateLimiter | 5 | 100% | ✅ |
+| ErrorMessages | 5 | 100% | ✅ |
+| **TOTAL** | **155** | **100%** | **✅** |
+
+### HTML Test Report
+
+Generate a beautiful HTML report with:
+- Summary cards (Total, Passed, Failed, Errors, Time)
+- Visual progress bar with pass rate
+- Detailed test class breakdown
+- Color-coded status indicators
+- Execution time statistics
+
+```bash
+# Run tests and generate report
+mvn clean test
+python3 generate-test-report.py
+
+# View report
+open target/test-report/index.html
 ```
-src/test/java/com/example/springbootplayground/
-├── config/
-│   ├── RateLimiterTest.java              (5 tests)
-│   └── RateLimiterPropertiesTest.java    (13 tests)
-├── service/
-│   └── RateLimiterServiceTest.java       (13 tests)
-├── util/
-│   ├── RequestUtilsTest.java             (6 tests)
-│   └── StringUtilsTest.java              (105 tests)
-├── dto/
-│   └── ErrorResponseTest.java            (8 tests)
-└── constant/
-    └── ErrorMessagesTest.java            (5 tests)
-```
 
-### Coverage Status
+**Note**: JaCoCo coverage is temporarily disabled due to Java 26 preview incompatibility.
 
-| Component | Tests | Status |
-|-----------|-------|--------|
-| RateLimiter | 5 | ✅ 100% |
-| RateLimiterProperties | 13 | ✅ 100% |
-| RateLimiterService | 13 | ✅ 100% |
-| RequestUtils | 6 | ✅ 100% |
-| StringUtils | 105 | ✅ 100% |
-| ErrorResponse | 8 | ✅ 100% |
-| ErrorMessages | 5 | ✅ 100% |
-
-**Note**: JaCoCo coverage reporting is temporarily disabled due to Java 26 preview features incompatibility. JaCoCo 0.8.12 doesn't support class file major version 70. Coverage will be re-enabled when JaCoCo updates for Java 26 support.
-
-### Test Categories
-
-#### ✅ Unit Tests
-- Individual component testing
-- Edge cases and boundary values
-- Null and empty input handling
-- Exception scenarios
-
-#### ✅ Integration Tests  
-- Component interaction testing
-- Rate limiting behavior
-- Configuration loading
-
-#### ✅ Edge Case Tests
-- Empty/null inputs
-- Boundary conditions
-- Concurrent access scenarios
+📖 **Complete testing documentation**: See [docs/testing/README.md](docs/testing/README.md)
 
 ## 🤝 Contributing
 
