@@ -2,40 +2,62 @@ package com.example.springbootplayground.exception;
 
 import com.example.springbootplayground.constant.ErrorMessages;
 import com.example.springbootplayground.dto.ErrorResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.concurrent.ThreadLocalRandom;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final String ID_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private static final int ID_LENGTH = 16;
+
     @ExceptionHandler(RateLimitExceededException.class)
     public ResponseEntity<ErrorResponse> handleRateLimitExceededException(RateLimitExceededException ex) {
+        String errorId = generateFastId();
+
         ErrorResponse errorResponse = new ErrorResponse(
-                UUID.randomUUID().toString(),
+                errorId,
                 HttpStatus.TOO_MANY_REQUESTS.value(),
                 ErrorMessages.TOO_MANY_REQUESTS,
                 ex.getMessage(),
-                LocalDateTime.now().toString()
+                Instant.now().toString()
         );
 
+        log.debug("Rate limit exceeded: errorId={}", errorId);
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex) {
+        String errorId = generateFastId();
+
+        log.error("Unhandled exception: errorId={}", errorId, ex);
+
         ErrorResponse errorResponse = new ErrorResponse(
-                UUID.randomUUID().toString(),
+                errorId,
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 ErrorMessages.INTERNAL_SERVER_ERROR,
-                ex.getMessage(),
-                LocalDateTime.now().toString()
+                "An unexpected error occurred. Reference: " + errorId,
+                Instant.now().toString()
         );
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+    private String generateFastId() {
+        StringBuilder sb = new StringBuilder(ID_LENGTH);
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        for (int i = 0; i < ID_LENGTH; i++) {
+            sb.append(ID_CHARS.charAt(random.nextInt(ID_CHARS.length())));
+        }
+        return sb.toString();
     }
 }

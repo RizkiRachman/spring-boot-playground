@@ -14,11 +14,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 public class RateLimitingFilter extends OncePerRequestFilter {
+
+    private static final String ID_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private static final int ID_LENGTH = 16;
 
     @Autowired
     private RateLimiter rateLimiter;
@@ -34,11 +37,11 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
         if (!rateLimiter.isAllowed(clientId)) {
             ErrorResponse errorResponse = new ErrorResponse(
-                    UUID.randomUUID().toString(),
+                    generateFastId(),
                     HttpStatus.TOO_MANY_REQUESTS.value(),
                     ErrorMessages.TOO_MANY_REQUESTS,
                     ErrorMessages.RATE_LIMIT_EXCEEDED,
-                    LocalDateTime.now().toString()
+                    Instant.now().toString()
             );
 
             String jsonResponse = objectMapper.writeValueAsString(errorResponse);
@@ -52,11 +55,26 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    private String generateFastId() {
+        StringBuilder sb = new StringBuilder(ID_LENGTH);
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        for (int i = 0; i < ID_LENGTH; i++) {
+            sb.append(ID_CHARS.charAt(random.nextInt(ID_CHARS.length())));
+        }
+        return sb.toString();
+    }
+
     private String getClientId(HttpServletRequest request) {
         String xForwardedFor = request.getHeader("X-Forwarded-For");
         if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-            return xForwardedFor.split(",")[0].trim();
+            // Manual parse to avoid regex split overhead
+            int commaIndex = xForwardedFor.indexOf(',');
+            if (commaIndex > 0) {
+                return xForwardedFor.substring(0, commaIndex).trim();
+            }
+            return xForwardedFor.trim();
         }
-        return request.getRemoteAddr();
+        String remoteAddr = request.getRemoteAddr();
+        return remoteAddr != null ? remoteAddr : "unknown";
     }
 }
