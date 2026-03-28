@@ -1,8 +1,8 @@
 package com.example.springbootplayground.exception;
 
+import com.dev.common.string.StringUtils;
 import com.example.springbootplayground.constant.ErrorMessages;
 import com.example.springbootplayground.dto.ErrorResponse;
-import com.example.springbootplayground.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
