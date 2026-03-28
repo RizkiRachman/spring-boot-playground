@@ -1,8 +1,9 @@
 package com.example.springbootplayground.exception;
 
+import com.dev.common.exception.ErrorResponse;
+import com.dev.common.exception.RateLimitExceededException;
 import com.dev.common.string.StringUtils;
 import com.example.springbootplayground.constant.ErrorMessages;
-import com.example.springbootplayground.dto.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -18,10 +19,10 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(RateLimitExceededException.class)
-    public ResponseEntity<ErrorResponse> handleRateLimitExceededException(RateLimitExceededException ex) {
+    public ResponseEntity<com.example.springbootplayground.dto.ErrorResponse> handleRateLimitExceededException(RateLimitExceededException ex) {
         String errorId = StringUtils.generateFastId();
 
-        ErrorResponse errorResponse = ErrorResponse.builder()
+        com.example.springbootplayground.dto.ErrorResponse errorResponse = com.example.springbootplayground.dto.ErrorResponse.builder()
                 .id(errorId)
                 .errorCode(HttpStatus.TOO_MANY_REQUESTS.value())
                 .errorMessage(ErrorMessages.TOO_MANY_REQUESTS)
@@ -34,12 +35,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex) {
+    public ResponseEntity<com.example.springbootplayground.dto.ErrorResponse> handleAllExceptions(Exception ex) {
         String errorId = StringUtils.generateFastId();
 
         log.error("Unhandled exception: errorId={}", errorId, ex);
 
-        ErrorResponse errorResponse = ErrorResponse.builder()
+        com.example.springbootplayground.dto.ErrorResponse errorResponse = com.example.springbootplayground.dto.ErrorResponse.builder()
                 .id(errorId)
                 .errorCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .errorMessage(ErrorMessages.INTERNAL_SERVER_ERROR)
