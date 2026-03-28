@@ -51,11 +51,11 @@
             <scope>test</scope>
         </dependency>
         <!-- JaCoCo for coverage (Disabled for Java 26 Preview) -->
-        <!-- 
+        <!--
         NOTE: JaCoCo disabled due to Java 26 preview features incompatibility.
         JaCoCo 0.8.12 doesn't support class file major version 70 (Java 26).
         Re-enable after JaCoCo updates to support Java 26.
-        
+
         <dependency>
             <groupId>org.jacoco</groupId>
             <artifactId>org.jacoco.agent</artifactId>
@@ -63,6 +63,12 @@
             <scope>test</scope>
         </dependency>
         -->
+        <!-- Common Utils Java - Shared utility library -->
+        <dependency>
+            <groupId>com.dev</groupId>
+            <artifactId>common-utils-java</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
