@@ -1,12 +1,13 @@
 # Spring Boot Playground
 
-A playground project for experimenting with Spring Boot features and best practices, featuring production-ready rate limiting, exception handling, and Java 26 preview features.
+A playground project for experimenting with Spring Boot features and best practices, featuring production-ready rate limiting, exception handling, and shared library integrations.
 
 ## 🚀 Features
 
 - ✨ **REST API** with Spring Boot 4.0.0
 - 🛡️ **Dual-Layer Rate Limiting** (Bucket4j + Filter/Service)
 - ⚡ **Exception Handling** with @ControllerAdvice
+- 📦 **Shared Libraries** - Uses common-utils-java and common-exception-java
 - 📝 **Configuration Properties** for flexible rate limiting
 - 🔧 **Constructor Injection** for thread safety
 - 📊 **Global Exception Handling** with standardized JSON responses
@@ -29,14 +30,16 @@ src/main/java/com/example/springbootplayground/
 │   └── RateLimiterService.java
 ├── dto/                      # Data transfer objects (Lombok)
 │   └── ErrorResponse.java
-├── exception/               # Custom exceptions & handlers
-│   ├── GlobalExceptionHandler.java
-│   └── RateLimitExceededException.java
+├── exception/               # Exception handlers
+│   └── GlobalExceptionHandler.java
 ├── util/                   # Utility classes
-│   ├── RequestUtils.java
-│   └── StringUtils.java
+│   └── RequestUtils.java
 └── constant/
     └── ErrorMessages.java
+
+External Libraries (from Maven local repository):
+├── common-utils-java/       # StringUtils, utilities
+└── common-exception-java/   # RateLimitExceededException, ErrorResponse
 ```
 
 ## 🚀 Quick Start
@@ -112,6 +115,39 @@ curl http://localhost:8080/api/premium
 | Maven | 3.9+ | Build tool |
 | Jackson | Latest | JSON serialization |
 
+## 📦 Dependencies
+
+### Shared Libraries
+
+This project uses shared libraries to avoid code duplication across microservices:
+
+#### common-utils-java
+- **Purpose**: Utility classes (StringUtils, pagination, validation)
+- **Location**: Local Maven repository (`~/.m2/repository/com/dev/`)
+- **Classes Used**: `StringUtils`
+- **Repository**: https://github.com/RizkiRachman/common-utils-java
+
+#### common-exception-java
+- **Purpose**: Standardized exceptions and error responses
+- **Location**: Local Maven repository (`~/.m2/repository/com/dev/`)
+- **Classes Used**: `RateLimitExceededException`, `ErrorResponse`
+- **Repository**: https://github.com/RizkiRachman/common-exception-java
+
+### Installation
+
+```bash
+# Install common-utils-java to local Maven repo
+cd /path/to/common-utils-java
+mvn clean install
+
+# Install common-exception-java to local Maven repo
+cd /path/to/common-exception-java
+mvn clean install
+
+# Then build this project
+mvn clean compile
+```
+
 ## 🎯 Java 26 Features
 
 - ✅ **Records** (Stable) - Used in ErrorResponse
@@ -123,7 +159,7 @@ curl http://localhost:8080/api/premium
 
 ## 🧪 Testing
 
-We have **155 comprehensive unit tests** covering all major components.
+We have **50 comprehensive unit tests** covering application components. Shared libraries (common-utils-java and common-exception-java) have their own test suites.
 
 ### Quick Start
 
@@ -131,8 +167,7 @@ We have **155 comprehensive unit tests** covering all major components.
 # Run all tests
 mvn clean test
 
-# Generate beautiful HTML report
-python3 generate-test-report.py
+# Generate beautiful HTML report (auto-generated after tests)
 open target/test-report/index.html
 ```
 
@@ -140,14 +175,21 @@ open target/test-report/index.html
 
 | Component | Tests | Coverage | Status |
 |-----------|-------|----------|--------|
-| StringUtils | 105 | 100% | ✅ |
-| ErrorResponse | 8 | 100% | ✅ |
 | RateLimiterProperties | 13 | 100% | ✅ |
 | RateLimiterService | 13 | 100% | ✅ |
+| HelloController | 5 | 100% | ✅ |
 | RequestUtils | 6 | 100% | ✅ |
 | RateLimiter | 5 | 100% | ✅ |
 | ErrorMessages | 5 | 100% | ✅ |
-| **TOTAL** | **155** | **100%** | **✅** |
+| GlobalExceptionHandler | 3 | 100% | ✅ |
+| **TOTAL** | **50** | **100%** | **✅** |
+
+### Shared Library Tests
+
+| Library | Tests | Coverage | Status |
+|-----------|-------|----------|--------|
+| common-utils-java | 155+ | 90%+ | ✅ |
+| common-exception-java | 43 | 90%+ | ✅ |
 
 ### HTML Test Report
 
@@ -181,7 +223,7 @@ Please follow our [PR template](.github/PULL_REQUEST_TEMPLATE.md) when submittin
 ### Pre-PR Checklist
 - [ ] Clean compile (`mvn clean compile -q`)
 - [ ] Run tests (`mvn test`)
-- [ ] All 155 tests must pass
+- [ ] All 50 tests must pass
 - [ ] Start application locally (`mvn spring-boot:run`)
 - [ ] Manual testing completed
 - [ ] No breaking changes
@@ -195,5 +237,5 @@ Please follow our [PR template](.github/PULL_REQUEST_TEMPLATE.md) when submittin
 
 ---
 
-*Built with ❤️ using Spring Boot and Java 26*
-*155 tests passing ✅*
+*Built with ❤️ using Spring Boot, Java 26, and Shared Libraries*
+*50 tests passing ✅*

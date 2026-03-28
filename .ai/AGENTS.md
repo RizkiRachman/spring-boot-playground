@@ -1,7 +1,7 @@
 # AGENTS.md for spring-boot-playground
 
 ## Project Overview
-This is a Spring Boot playground project for experimenting with Spring Boot features. The project follows standard Spring Boot conventions.
+This is a Spring Boot playground project for experimenting with Spring Boot features. The project uses shared libraries (common-utils-java and common-exception-java) to avoid code duplication across microservices.
 
 ## Architecture
 - **Main Application**: `src/main/java/.../Application.java` annotated with `@SpringBootApplication`
@@ -10,6 +10,7 @@ This is a Spring Boot playground project for experimenting with Spring Boot feat
 - **Repositories**: Data access in `src/main/java/.../repository/` extending `JpaRepository`
 - **Entities**: JPA entities in `src/main/java/.../entity/`
 - **Configuration**: Properties in `src/main/resources/application.properties`
+- **Shared Libraries**: Uses `common-utils-java` and `common-exception-java` from local Maven repository
 
 ## Build System
 Uses Maven with `pom.xml` in project root. Currently using Spring Boot 4.0.0.
@@ -72,17 +73,21 @@ Before creating any Pull Request, AI MUST:
 ```
 src/test/java/com/example/springbootplayground/
 ├── config/
-│   └── RateLimiterTest.java
+│   ├── RateLimiterTest.java
+│   └── RateLimiterPropertiesTest.java
 ├── controller/
 │   └── HelloControllerTest.java
 ├── service/
 │   └── RateLimiterServiceTest.java
 ├── util/
-│   ├── RequestUtilsTest.java
-│   └── StringUtilsTest.java
+│   └── RequestUtilsTest.java
+├── constant/
+│   └── ErrorMessagesTest.java
 └── exception/
     └── GlobalExceptionHandlerTest.java
 ```
+
+**Note**: StringUtils tests are in the `common-utils-java` library. RateLimitExceededException tests are in the `common-exception-java` library. This project has **50 tests** for application-specific code.
 
 ### Test Naming Conventions
 - Class name: `{ClassName}Test`
@@ -104,12 +109,39 @@ src/test/java/com/example/springbootplayground/
 - Database: H2 in-memory for development, configurable via profiles
 
 ## Dependencies
-Common starters:
+
+### Spring Boot Starters
 - `spring-boot-starter-web`: For REST APIs
 - `spring-boot-starter-data-jpa`: For JPA repositories
 - `spring-boot-starter-test`: For testing
 - `spring-boot-starter-actuator`: For monitoring
 - `lombok`: For code generation
+
+### Shared Libraries (Local Maven Repository)
+These libraries must be installed locally before building this project:
+
+**common-utils-java** (com.dev:common-utils-java:1.0.0-SNAPSHOT)
+- Utility classes: StringUtils, pagination, validation
+- Install: `cd /path/to/common-utils-java && mvn clean install`
+
+**common-exception-java** (com.dev:common-exception-java:1.0.0-SNAPSHOT)
+- Exceptions: RateLimitExceededException, BusinessException, ErrorResponse
+- Install: `cd /path/to/common-exception-java && mvn clean install`
+
+### Installation Order
+```bash
+# 1. Install common-utils-java first
+cd /path/to/common-utils-java
+mvn clean install
+
+# 2. Install common-exception-java
+cd /path/to/common-exception-java
+mvn clean install
+
+# 3. Then build this project
+cd /path/to/spring-boot-playground
+mvn clean compile
+```
 
 ## Integration Points
 - External APIs: Use `RestTemplate` or `WebClient`
