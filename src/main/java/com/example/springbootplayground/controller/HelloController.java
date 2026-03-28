@@ -1,9 +1,9 @@
 package com.example.springbootplayground.controller;
 
+import com.dev.common.exception.RateLimitExceededException;
 import com.dev.common.string.StringUtils;
 import com.example.springbootplayground.service.RateLimiterService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,22 +37,20 @@ public class HelloController {
         String endpointKey = "external:" + apiName;
 
         // Service-layer rate limiting with properties configuration
-        if (rateLimiterService.isAllowedForEndpoint(endpointKey, clientId)) {
-            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                    .body(Map.of(
-                            "id", StringUtils.generateFastId(),
-                            "errorCode", 429,
-                            "errorMessage", "Too Many Requests",
-                            "detailMessage", "Rate limit exceeded for API: " + apiName,
-                            "timestamp", Instant.now().toString()
-                    ));
+        if (!rateLimiterService.isAllowedForEndpoint(endpointKey, clientId)) {
+            throw new RateLimitExceededException(
+                    "Rate limit exceeded for API: " + apiName,
+                    endpointKey,
+                    60
+            );
         }
 
         // Simulate external API call
         return ResponseEntity.ok(Map.of(
                 "message", "External API call successful",
                 "api", apiName,
-                "clientId", clientId
+                "clientId", clientId,
+                "timestamp", Instant.now().toString()
         ));
     }
 
@@ -61,21 +59,19 @@ public class HelloController {
         String clientId = getClientId(request);
 
         // Service-layer rate limiting with properties configuration
-        if (rateLimiterService.isAllowedForEndpoint("premium", clientId)) {
-            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                    .body(Map.of(
-                            "id", StringUtils.generateFastId(),
-                            "errorCode", 429,
-                            "errorMessage", "Too Many Requests",
-                            "detailMessage", "Premium API rate limit exceeded",
-                            "timestamp", Instant.now().toString()
-                    ));
+        if (!rateLimiterService.isAllowedForEndpoint("premium", clientId)) {
+            throw new RateLimitExceededException(
+                    "Premium API rate limit exceeded",
+                    "premium",
+                    60
+            );
         }
 
         return ResponseEntity.ok(Map.of(
                 "message", "Premium API call successful",
                 "tier", "premium",
-                "clientId", clientId
+                "clientId", clientId,
+                "timestamp", Instant.now().toString()
         ));
     }
 }
